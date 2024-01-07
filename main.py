@@ -57,9 +57,15 @@ def starred_repositories(username, headers = DEFAULT_HEADERS):
         repository_release = latest_release(release['full_name'])
         if repository_release.get("error"):
             continue
-        release_tag = repository_release['tag_name']
-        details.extend(release_tag)
-    return details
+        release = {
+            'name': release['full_name'],
+            'tag_name': repository_release['tag_name'],
+            'published_at': repository_release['published_at'],
+        }
+        details.append(release)
+    sorted_details = sorted(details, key=lambda x: x['published_at'], reverse=True)
+    return sorted_details
+    # return details
 
 
 def print_latest_release(data):
@@ -71,5 +77,6 @@ def print_latest_release(data):
     print(data["body"])
 
 print(starred_repositories("mireknguyen"))
+# print(latest_release("mireknguyen/mirekng-homepage"))
 limits = get_limits()
 print(limits['rate'])
