@@ -11,12 +11,16 @@ settings = SettingsLoader()
 env = settings.load_env()
 USER = env.get("USER")
 GITHUB_TOKEN = env.get("GITHUB_TOKEN")
+OUT_DIR = env.get("OUT_DIR")
 
 if GITHUB_TOKEN is None:
     print("GITHUB_TOKEN is not set.")
     sys.exit(1)
 if USER is None:
     print("USER is not set.")
+    sys.exit(1)
+if OUT_DIR is None:
+    print("OUT_DIR is not set.")
     sys.exit(1)
 
 DEFAULT_HEADERS = {
@@ -39,7 +43,7 @@ feed.generate_fg(
     subtitle="Github RSS",
     link=f"https://api.github.com/users/{USER}",
 )
-if feed.generate_rss(fe_list, "out/rss.xml"):
+if feed.generate_rss(fe_list, OUT_DIR):
     print("RSS feed generated.")
 else:
     print("RSS feed generation failed.")
