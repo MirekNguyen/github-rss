@@ -4,17 +4,15 @@ from feedgen.feed import FeedGenerator
 class Feed:
     """This class is used to generate the RSS feed."""
     fg = FeedGenerator()
-    """Generate fg as wrapper"""
-    def generate_fg(self, feed_id, title, subtitle, link, language="en") -> bool:
+    def generate_fg(self, feed_id, title, subtitle, link) -> bool:
         """This function is used to generate the RSS feed."""
         self.fg.id(feed_id)
         self.fg.title(title)
         self.fg.subtitle(subtitle)
         self.fg.link(href=link, rel="self")
-        self.fg.language(language)
+        self.fg.language("en")
         return True
 
-    """This method is used to generate the RSS feed."""
     def generate_rss(self, fe_list, file) -> bool:
         """This function is used to generate the RSS feed."""
         for feed in fe_list:

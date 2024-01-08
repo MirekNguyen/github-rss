@@ -1,8 +1,7 @@
+"""Main script to generate RSS feed from Github releases."""
 import os
 import sys
-from datetime import datetime
 
-import pytz
 from dotenv import load_dotenv
 
 from github_rss.feed_generator import Feed
@@ -24,23 +23,13 @@ DEFAULT_HEADERS = {
 
 r = Release()
 repository = Repository()
-starred = repository.starred_repositories(USER, DEFAULT_HEADERS)
-
-releases = r.latest_release_list(starred, DEFAULT_HEADERS)
-sorted_releases = Tools.sort_list_by(list=releases, key="published_at", reverse=False)
 feed = Feed()
-fe_list = map(
-    lambda release: {
-        "id": release["html_url"],
-        "title": release["name"],
-        "link": release["html_url"],
-        "description": release["body"],
-        "pubDate": pytz.timezone("Etc/UTC").localize(
-            datetime.strptime(release["published_at"], "%Y-%m-%dT%H:%M:%SZ")
-        ),
-    },
-    sorted_releases,
-)
+
+starred = repository.starred_repositories(USER, DEFAULT_HEADERS)
+releases = r.latest_release_list(starred, DEFAULT_HEADERS)
+sorted_releases = Tools.sort_list_by(lst=releases, key="published_at", reverse=False)
+fe_list = r.feedgen_format(sorted_releases)
+
 feed.generate_fg(
     feed_id=f"https://api.github.com/users/{USER}",
     title="Github RSS",
