@@ -1,7 +1,9 @@
+"""Get the latest release of a repository or a list of repositories"""
 import requests
 
 class Release:
     def latest_release(self, repository, headers):
+        """Get the latest release of a repository"""
         response = requests.get(
             f"https://api.github.com/repos/{repository}/releases/latest", headers=headers
         )
@@ -21,6 +23,7 @@ class Release:
 
 
     def latest_release_list(self, repository_list, headers):
+        """Get the latest release of a list of repositories"""
         details = []
         for release in repository_list:
             repository_release = self.latest_release(release, headers)
