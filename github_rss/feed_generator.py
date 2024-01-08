@@ -2,11 +2,11 @@
 from feedgen.feed import FeedGenerator
 
 class Feed:
-    fg = None
-    """This class is used to generate the fg"""
-    def generate_fg(self, feed_id, title, subtitle, link, language="en"):
+    """This class is used to generate the RSS feed."""
+    fg = FeedGenerator()
+    """Generate fg as wrapper"""
+    def generate_fg(self, feed_id, title, subtitle, link, language="en") -> bool:
         """This function is used to generate the RSS feed."""
-        self.fg = FeedGenerator()
         self.fg.id(feed_id)
         self.fg.title(title)
         self.fg.subtitle(subtitle)
@@ -14,16 +14,16 @@ class Feed:
         self.fg.language(language)
         return True
 
-    """This class is used to generate the RSS feed."""
-    def generate_rss(self, fg, fe_list, file):
+    """This method is used to generate the RSS feed."""
+    def generate_rss(self, fe_list, file) -> bool:
         """This function is used to generate the RSS feed."""
-        for fe in fe_list:
-            fe = fg.add_entry()
-            fe.id(fe["id"])
-            fe.title(fe["title"])
-            fe.link(href=fe["link"], replace=True)
-            fe.description(fe["description"])
-            fe.pubDate(fe["pubDate"])
-        fg.rss_str(pretty=True)
-        fg.rss_file(file)
+        for feed in fe_list:
+            fe = self.fg.add_entry()
+            fe.id(feed["id"])
+            fe.title(feed["title"])
+            fe.link(href=feed["link"], replace=True)
+            fe.description(feed["description"])
+            fe.pubDate(feed["pubDate"])
+        self.fg.rss_str(pretty=True)
+        self.fg.rss_file(file)
         return True

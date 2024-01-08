@@ -25,15 +25,16 @@ class Release:
     def latest_release_list(self, repository_list, headers):
         """Get the latest release of a list of repositories"""
         details = []
-        for release in repository_list:
-            repository_release = self.latest_release(release, headers)
+        for release_name in repository_list:
+            repository_release = self.latest_release(release_name, headers)
             if repository_release.get("error"):
                 continue
             release = {
-                "name": release,
+                "name": release_name,
                 "tag_name": repository_release["tag_name"],
                 "published_at": repository_release["published_at"],
+                "html_url": repository_release["html_url"],
+                "body": repository_release["body"],
             }
             details.append(release)
-        sorted_details = sorted(details, key=lambda x: x["published_at"], reverse=True)
-        return sorted_details
+        return details

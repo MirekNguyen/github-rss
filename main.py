@@ -1,13 +1,17 @@
 import os
 import sys
+from datetime import datetime
 
+import pytz
 from dotenv import load_dotenv
 
+from github_rss.feed_generator import Feed
 from github_rss.release import Release
 from github_rss.repository import Repository
 from github_rss.tools import Tools
 
 load_dotenv()
+USER = "mireknguyen"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 if GITHUB_TOKEN is None:
     print("GITHUB_TOKEN is not set.")
@@ -18,26 +22,33 @@ DEFAULT_HEADERS = {
     "Accept": "application/vnd.github.v3+json",
 }
 
-release = Release()
+r = Release()
 repository = Repository()
-starred = repository.starred_repositories("mireknguyen", DEFAULT_HEADERS)
+starred = repository.starred_repositories(USER, DEFAULT_HEADERS)
 
-releases = release.latest_release_list(starred, DEFAULT_HEADERS)
-sorted_releases = Tools.sort_list_by(releases, "published_at")
-print(sorted_releases)
-# print(Tools.get_limits(DEFAULT_HEADERS)["rate"])
-
-# print(release.latest_release("mireknguyen/mirekng-homepage", DEFAULT_HEADERS))
-# repository.starred_repositories("mireknguyen", DEFAULT_HEADERS)
-# print(starred_repositories("mireknguyen"))
-# print(latest_release("mireknguyen/mirekng-homepage"))
-
-# fe = {
-#     id: id,
-#     title: title,
-#     link: link,
-#     description: description,
-#     pubDate: pub_date,
-# }
-# fe_list = [ fe1, fe2, fe3]
-
+releases = r.latest_release_list(starred, DEFAULT_HEADERS)
+sorted_releases = Tools.sort_list_by(list=releases, key="published_at", reverse=False)
+feed = Feed()
+fe_list = map(
+    lambda release: {
+        "id": release["html_url"],
+        "title": release["name"],
+        "link": release["html_url"],
+        "description": release["body"],
+        "pubDate": pytz.timezone("Etc/UTC").localize(
+            datetime.strptime(release["published_at"], "%Y-%m-%dT%H:%M:%SZ")
+        ),
+    },
+    sorted_releases,
+)
+feed.generate_fg(
+    feed_id=f"https://api.github.com/users/{USER}",
+    title="Github RSS",
+    subtitle="Github RSS",
+    link=f"https://api.github.com/users/{USER}",
+)
+if feed.generate_rss(fe_list, "out/rss.xml"):
+    print("RSS feed generated.")
+else:
+    print("RSS feed generation failed.")
+    sys.exit(1)
