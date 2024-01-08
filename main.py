@@ -1,19 +1,22 @@
 """Main script to generate RSS feed from Github releases."""
-import os
 import sys
-
-from dotenv import load_dotenv
 
 from github_rss.feed_generator import Feed
 from github_rss.release import Release
 from github_rss.repository import Repository
 from github_rss.tools import Tools
+from github_rss.settings_loader import SettingsLoader
 
-load_dotenv()
-USER = "mireknguyen"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+settings = SettingsLoader()
+env = settings.load_env()
+USER = env.get("USER")
+GITHUB_TOKEN = env.get("GITHUB_TOKEN")
+
 if GITHUB_TOKEN is None:
     print("GITHUB_TOKEN is not set.")
+    sys.exit(1)
+if USER is None:
+    print("USER is not set.")
     sys.exit(1)
 
 DEFAULT_HEADERS = {
